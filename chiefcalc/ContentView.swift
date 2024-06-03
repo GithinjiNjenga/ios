@@ -45,22 +45,20 @@ enum Operations {
 }
 
 struct ContentView: View {
-    @State var value = "0"
+    @State var value: String = "0" // Change data type to String
     @State var operationNow: Operations = .none
-    @State var runningNumber = 0
-    let buttons: [[MyCalculatorButtons]] =
-    [
-        [.clear,.percentage, .negative, .divide],
+    @State var runningNumber: Double = 0 // Change data type to Double
+    let buttons: [[MyCalculatorButtons]] = [
+        [.clear, .percentage, .negative, .divide],
         [.seven, .eight, .nine, .multiply],
         [.four, .five, .six, .substract],
         [.one, .two, .three, .plus],
         [.zero, .decimal, .equal]
-        
     ]
+    
     var body: some View {
         ZStack {
-            Color.black.edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
-            
+            Color.black.edgesIgnoringSafeArea(.all)
             VStack {
                 Spacer()
                 HStack{
@@ -68,7 +66,7 @@ struct ContentView: View {
                     Text(value)
                         .bold()
                         .font(.system(size: 90))
-                        .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
+                        .foregroundColor(.blue)
                 }
                 .padding()
                 
@@ -77,7 +75,6 @@ struct ContentView: View {
                         ForEach(row, id: \.self) { item in
                             Button(action: {
                                 self.didTap(button: item)
-                                
                             }, label: {
                                 Text(item.rawValue)
                                     .frame(width: self.buttonWidth(item: item), height: self.buttonheight(item: item))
@@ -85,7 +82,6 @@ struct ContentView: View {
                                     .foregroundColor(.white)
                                     .cornerRadius(self.buttonWidth(item: item)/2)
                             })
-                            
                         }
                         .padding(.bottom, 3)
                     }
@@ -93,22 +89,16 @@ struct ContentView: View {
             }
         }
     }
+    
     func didTap(button: MyCalculatorButtons) {
         switch button {
         case .plus, .substract, .multiply, .divide:
-            switch button {
-            case .plus: operationNow = .add
-            case .substract: operationNow = .subtract
-            case .multiply: operationNow = .multiply
-            case .divide: operationNow = .divide
-            default: break
-            }
-            
-            runningNumber = Int(value) ?? 0
+            operationNow = getOperation(from: button)
+            runningNumber = Double(value) ?? 0
             value = "0"
         case .equal:
-
-            let currentValue = Int(value) ?? 0
+        
+            let currentValue = Double(value) ?? 0
             switch operationNow {
             case .add: value = "\(runningNumber + currentValue)"
             case .subtract: value = "\(runningNumber - currentValue)"
@@ -127,10 +117,12 @@ struct ContentView: View {
             operationNow = .none
             runningNumber = 0
         case .decimal:
+        
             if !value.contains(".") {
                 value += "."
             }
         case .negative:
+            
             if value != "0" {
                 if value.hasPrefix("-") {
                     value.removeFirst()
@@ -139,6 +131,7 @@ struct ContentView: View {
                 }
             }
         case .percentage:
+            
             let currentValue = Double(value) ?? 0
             value = "\(currentValue / 100)"
         default:
@@ -150,24 +143,35 @@ struct ContentView: View {
             }
         }
     }
-
-
+    
     func buttonWidth(item: MyCalculatorButtons) -> CGFloat {
         if item == .equal{
             return ((UIScreen.main.bounds.width - (4 * 12)) / 4) * 2
-
         }
         return (UIScreen.main.bounds.width - (5 * 12)) / 4
     }
-    func buttonheight(item: MyCalculatorButtons) -> CGFloat{
+    
+    func buttonheight(item: MyCalculatorButtons) -> CGFloat {
         return (UIScreen.main.bounds.width  - (5 * 12)) / 4
     }
     
+    func getOperation(from button: MyCalculatorButtons) -> Operations {
+        switch button {
+        case .plus: return .add
+        case .substract: return .subtract
+        case .multiply: return .multiply
+        case .divide: return .divide
+        default: return .none
+        }
+    }
+}
+
     
     struct ContentView_Preview: PreviewProvider{
         static var previews: some View{
             ContentView()
         }
     }
-}
+
+
 
